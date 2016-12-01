@@ -1,5 +1,6 @@
 package com.elijahcodes.frienemy;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +25,11 @@ public class MainActivity extends AppCompatActivity {
         sqLiteDatabase.execSQL("CREATE TABLE contacts(name TEXT, phone INTEGER, email TEXT");
         sqLiteDatabase.execSQL("INSERT INTO contacts VALUES('John', 185157126, 'john@email.com');");
         sqLiteDatabase.execSQL("INSERT INTO contacts VALUES('Sam', 827176452, 'sam@email.eu');");
+
+        Cursor query = sqLiteDatabase.rawQuery("SELECT * FROM contacts;", null);
+        if(query.moveToFirst()){
+
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
