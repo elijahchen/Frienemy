@@ -1,12 +1,15 @@
 package com.elijahcodes.frienemy;
 
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +43,16 @@ public class MainActivity extends AppCompatActivity {
 
         int hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS);
         Log.d(TAG, "onCreate: checkSelfPermission = " + hasReadContactPermission);
+
+        if(hasReadContactPermission == PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "onCreate: Permission Granted");
+            READ_CONTACTS_GRANTED = true;
+        } else {
+            Log.d(TAG, "onCreate: Requesting Permission");
+            ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
+        }
+        
+        
 
         //TEST
 //        SQLiteDatabase sqLiteDatabase = getBaseContext().openOrCreateDatabase("sqlite-test.db", MODE_PRIVATE, null);
@@ -95,6 +108,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Log.d(TAG, "onCreate: Ends");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: Starts");
+        switch(requestCode){
+            case REQUEST_CODE_READ_CONTACTS:{
+                // When request is cancelled, arrays will be empty
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Log.d(TAG, "onRequestPermissionsResult: Permission Granted");
+                    READ_CONTACTS_GRANTED = true;
+                } else
+                    Log.d(TAG, "onRequestPermissionsResult: Permission Denied");
+            }
+            Log.d(TAG, "onRequestPermissionsResult: Ends");
+        }
     }
 
     @Override
