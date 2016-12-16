@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView contactNames;
     private static final int REQUEST_CODE_READ_CONTACTS = 1;
     private static boolean READ_CONTACTS_GRANTED = false;
+    FloatingActionButton fab = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onCreate: Requesting Permission");
             ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
         }
-        
-        
 
         //TEST
 //        SQLiteDatabase sqLiteDatabase = getBaseContext().openOrCreateDatabase("sqlite-test.db", MODE_PRIVATE, null);
@@ -80,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        query.close();
 //        sqLiteDatabase.close();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
                     READ_CONTACTS_GRANTED = true;
                 } else
                     Log.d(TAG, "onRequestPermissionsResult: Permission Denied");
-            }
+                }
+//            fab.setEnabled(READ_CONTACTS_GRANTED);
             Log.d(TAG, "onRequestPermissionsResult: Ends");
         }
     }
