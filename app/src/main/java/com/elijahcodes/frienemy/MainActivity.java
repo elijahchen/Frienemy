@@ -45,40 +45,13 @@ public class MainActivity extends AppCompatActivity {
         int hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS);
         Log.d(TAG, "onCreate: checkSelfPermission = " + hasReadContactPermission);
 
-        if(hasReadContactPermission == PackageManager.PERMISSION_GRANTED){
+        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onCreate: Permission Granted");
             READ_CONTACTS_GRANTED = true;
         } else {
             Log.d(TAG, "onCreate: Requesting Permission");
             ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
         }
-
-        //TEST
-//        SQLiteDatabase sqLiteDatabase = getBaseContext().openOrCreateDatabase("sqlite-test.db", MODE_PRIVATE, null);
-//        String sql = "DROP TABLE IF EXISTS contacts;";
-//        Log.d(TAG, "onCreate: sql = " + sql);
-//        sqLiteDatabase.execSQL(sql);
-//        sql = "CREATE TABLE IF NOT EXISTS contacts(name TEXT, phone INTEGER, email TEXT);";
-//        Log.d(TAG, "onCreate: sql is " + sql);
-//        sqLiteDatabase.execSQL(sql);
-//        sql = "INSERT INTO contacts VALUES('John', 185157126, 'john@email.com');";
-//        Log.d(TAG, "onCreate: sql is " + sql);
-//        sqLiteDatabase.execSQL(sql);
-//        sql = "INSERT INTO contacts VALUES('Sam', 827176452, 'sam@email.eu');";
-//        Log.d(TAG, "onCreate: sql is " + sql);
-//        sqLiteDatabase.execSQL(sql);
-
-//        Cursor query = sqLiteDatabase.rawQuery("SELECT * FROM contacts;", null);
-//        if (query.moveToFirst()) {
-//            do {
-//                String name = query.getString(0);
-//                int phone = query.getInt(1);
-//                String email = query.getString(2);
-//                Toast.makeText(this, "Name = " + name + ", phone = " + phone + ", email = " + email, Toast.LENGTH_LONG).show();
-//            } while (query.moveToNext());
-//        }
-//        query.close();
-//        sqLiteDatabase.close();
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -87,23 +60,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: fab onClick: Starts");
-
-                String[] projection = {ContactsContract.Contacts.DISPLAY_NAME_PRIMARY};
-                ContentResolver contentResolver = getContentResolver();
-                Cursor cursor = contentResolver.query(
-                        ContactsContract.Contacts.CONTENT_URI,
-                        projection,
-                        null,
-                        null,
-                        ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
-                if(cursor != null){
-                    List<String> contacts = new ArrayList<String>();
-                    while(cursor.moveToNext()){
-                        contacts.add(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                if (READ_CONTACTS_GRANTED) {
+                    Log.d(TAG, "onClick: READ_CONTACTS_GRANTED " + READ_CONTACTS_GRANTED);
+                    String[] projection = {ContactsContract.Contacts.DISPLAY_NAME_PRIMARY};
+                    ContentResolver contentResolver = getContentResolver();
+                    Cursor cursor = contentResolver.query(
+                            ContactsContract.Contacts.CONTENT_URI,
+                            projection,
+                            null,
+                            null,
+                            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
+                    if (cursor != null) {
+                        List<String> contacts = new ArrayList<>();
+                        while (cursor.moveToNext()) {
+                            contacts.add(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                        }
+                        cursor.close();
+                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, R.layout.contact_detail, R.id.name, contacts);
+                        contactNames.setAdapter(arrayAdapter);
                     }
-                    cursor.close();
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.contact_detail,R.id.name, contacts);
-                    contactNames.setAdapter(arrayAdapter);
+                } else {
+                    //Much more interactive than toasts, part of material design
+                    Snackbar.make(view, "Please grant access to your Contacts", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Action", null).show();
                 }
                 Log.d(TAG, "fab onClick: Ends");
             }
@@ -114,15 +93,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: Starts");
-        switch(requestCode){
-            case REQUEST_CODE_READ_CONTACTS:{
+        switch (requestCode) {
+            case REQUEST_CODE_READ_CONTACTS: {
                 // When request is cancelled, arrays will be empty
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "onRequestPermissionsResult: Permission Granted");
                     READ_CONTACTS_GRANTED = true;
                 } else
                     Log.d(TAG, "onRequestPermissionsResult: Permission Denied");
-                }
+            }
 //            fab.setEnabled(READ_CONTACTS_GRANTED);
             Log.d(TAG, "onRequestPermissionsResult: Ends");
         }
