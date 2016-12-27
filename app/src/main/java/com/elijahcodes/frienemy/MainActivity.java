@@ -1,11 +1,13 @@
 package com.elijahcodes.frienemy;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +82,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     //Much more interactive than toasts, part of material design
-                    Snackbar.make(view, "Please grant access to your Contacts", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("Action", null).show();
+                    Snackbar.make(view, "This app cannot display your Contact records unless you grant access", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Grant Access", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Log.d(TAG, "onClick: Snackbar Starts");
+                                    if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, READ_CONTACTS)){
+                                        Log.d(TAG, "onClick: Snackbar calling requestPermissions");
+                                        ActivityCompat.requestPermissions(MainActivity.this, new String[] {READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
+                                    } else {
+                                        // If declined permission permanently, go to settings
+                                        Log.d(TAG, "onClick: ");
+                                        Intent intent = new Intent();
+                                        intent.setAction(Settings.ACTION_APPLICATION_SETTINGS);
+                                        Uri uri = Uri.fromParts("package", MainActivity.this.getPackageName(), null);
+                                        intent.setData(uri);
+                                        MainActivity.this.startActivity(intent);
+                                    }
+                                    Log.d(TAG, "onClick: SnackBar Ends");
+                                }
+                            }
+                            ).show();
                 }
                 Log.d(TAG, "fab onClick: Ends");
             }
